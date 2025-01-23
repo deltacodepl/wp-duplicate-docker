@@ -1,0 +1,11 @@
+20250120_tapflo_b5c4e08877b262157942_20250120074802_installer-backup.phpn dup-installer index.html.backup.6
+root root 405 Feb 6 2020 index.php -rw-r--r-- 1 root root 19915 Jan 1 2024 license.txt -rw-
+r--r-- 1 root root 7409 Jun 18 2024 readme.html -rw-r--r-- 1 root root 7387 Feb 13 2024 
+wp-activate.php drwxrwxrwx 9 root root 4096 Jan 20 07:48 wp-admin -rw-r--r-- 1 root root 351 Feb 6 2020
+wp-blog-header.php -rw-r--r-- 1 root root 2323 Jun 14 2023 wp-comments-post.php -rw-r--r-- 1 root root
+ 3033 Mar 11 2024 wp-config-sample.php drwxrwxrwx 10 root root 4096 Jan 20 07:48 wp-content -rw-r--r-- 
+ 1 root root 5638 May 30 2023 wp-cron.php drwxrwxrwx 30 root root 12288 Jan 20 07:48 wp-includes -rw-r-
+ r-- 1 root root 2502 Nov 26 2022 wp-links-opml.php -rw-r--r-- 1 root root 3937 Mar 11 2024 wp-load.php 
+ -rw-r--r-- 1 root root 51238 May 28 2024 wp-login.php -rw-r--r-- 1 root root 8525 Sep 16 2023 wp-mail.php 
+ -rw-r--r-- 1 root root 28774 Jul 9 2024 wp-settings.php -rw-r--r-- 1 root root 34385 Jun 19 2023 wp-signup.php -
+ rw-r--r-- 1 root root 4885 Jun 22 2023 wp-trackback.php -rw-r--r-- 1 root root 3246 Mar 2 2024 xmlrpc.php

@@ -14,7 +14,7 @@ shopt -s dotglob
 
 WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST:-localhost}
 WORDPRESS_DB_USER=${WORDPRESS_DB_USER:-wordpress}
-WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD:-password}
+WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD:-tapflo}
 
 export MYSQL_PWD=${WORDPRESS_DB_PASSWORD}
 export MYSQL="mysql -h${WORDPRESS_DB_HOST} -u${WORDPRESS_DB_USER}"
@@ -77,9 +77,14 @@ ${MYSQL} -D${WORDPRESS_DB_NAME} -e "${SQL}"
 function archive_is_duplicate()
 {
     archive=$1
+
+    echo $(ls -al /wp-archive)
+    # $(${archive})
     # check it's a duplicator archive, with: database.sql wp-config.php
-    unzip -l ${archive} database.sql wp-config.php | grep -o '2 files' > /dev/null
+    unzip -l ${archive} */wp-config.php | grep -o '2 files' > /dev/null
+    echo "Duplicate check ${$?}"
     if [ "$?" -ne 0 ]; then
+        echo "Err ${archive}"
         return 1
     else
         return 0
@@ -102,6 +107,7 @@ function db_drop()
 
 function files_restore()
 {
+    echo "files restore ${archive} ${destdir}}"
     archive=$1
     destdir=$2
     unzip ${archive} -x database.sql -d ${destdir}
@@ -131,10 +137,16 @@ function restore_duplicate()
     archive=$1
     echo "Restore database"
     tmpdir=$(mktemp -d /tmp/duperestore.XXXXXXXXX)
-    mkdir -p ${tmpdir}
-    unzip -q ${archive} database.sql -d ${tmpdir}
-
-    db_restore ${tmpdir}/database.sql
+    echo ${archive} ${tmpdir} ${archive}
+    #mkdir -p ${tmpdir}
+    unzip -q ${archive} */dup-database__b5c4e08-20074802.sql -d ${tmpdir}
+    echo $(ls -al ${tmpdir}/${archive:12: -4}/dup-installer/) # ok
+    chmod -R +x "${tmpdir}/${archive:12: -4}/dup-installer/"
+    db_sql=$(eval echo "\${tmpdir}/\${archive:12: -4}/dup-installer/dup-database__b5c4e08-20074802.sql")
+    #echo "DB SQL path... "${tmpdir}/${archive:12: -4}/dup-installer/dup-database__b5c4e08-20074802.sql""
+    # echo $(cat ${db_sql}) ok
+    db_restore ${db_sql}
+    #db_restore "${tmpdir}/${archive:12: -4}/dup-installer/dup-database__b5c4e08-20074802.sql"
     if [ -n ${WORDPRESS_URL} ]; then
         echo "Update urls to ${WORDPRESS_URL}" 1>&2
         db_update_urls ${WORDPRESS_URL}
@@ -142,7 +154,7 @@ function restore_duplicate()
         echo Not updating urls
     fi
 
-    rm ${tmpdir}/database.sql
+    rm ${tmpdir}/${archive:12: -4}/dup-installer/dup-database__b5c4e08-20074802.sql
     rmdir ${tmpdir}
 
     dir_empty ${destdir}
@@ -183,7 +195,9 @@ END
 }
 
 function main()
-{
+{   
+    chmod -R 777 /wp-archive
+    echo "Duplicator restoring..."
     if [ $# -lt 2 ]; then
         echo $#
         echo $*
@@ -193,23 +207,27 @@ function main()
 
     archive=$1
     destdir=$2    
+    echo "OK ${archive} ${destdir}"
 
-    archive_is_duplicate ${archive}
+    #archive_is_duplicate ${archive}
+    echo "OK {$3}"
     if [ $? -eq 1 ]; then
         echo "${archive} was not created by wordpress-duplicator" 1>&2
         exit 1
     fi
 
     if [ "$3" = "--overwrite" ]; then
+        echo "Overwrite {$3} ${destdir}"
         rm -rf ${destdir}/* ${destdir}/.??*
     fi
+
     db_create
 
     db_is_populated
+
     if [ "$3" = "--overwrite" ] && [ $? -eq 0 ]; then
         restore_duplicate ${archive} ${destdir} $3
         exit $?
-
     else
         echo "Database already has tables, not restoring" 1>&2
         exit 2
