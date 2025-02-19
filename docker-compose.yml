@@ -21,7 +21,7 @@ services:
   wordpress:
     image: wordpress:6.6
     volumes:
-      - ./wp_data:/var/www/html
+      - ./wp-data:/var/www/html
       - ./wp-archive:/wp-archive
     ports:
       - 80:80
